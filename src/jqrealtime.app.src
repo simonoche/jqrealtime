@@ -1,0 +1,9 @@
+%% -*- erlang -*-
+{application, jqrealtime,
+ [{description, "jqrealtime"},
+  {vsn, "0.1"},
+  {modules, []},
+  {registered, []},
+  {mod, {'jqrealtime_app', []}},
+  {env, []},
+  {applications, [kernel, stdlib, crypto]}]}.
