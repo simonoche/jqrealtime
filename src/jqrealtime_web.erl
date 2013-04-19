@@ -27,7 +27,7 @@ loop(Req, DocRoot) ->
             Method when Method =:= 'GET'; Method =:= 'HEAD' ->
                 case Path of
                     "poll" ->
-                        poller:wait(Req);
+                        jqrealtime_poller:wait(Req);
                     _ ->
                         Req:serve_file(Path, DocRoot)
                 end;
