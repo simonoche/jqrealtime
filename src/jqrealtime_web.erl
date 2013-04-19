@@ -5,16 +5,27 @@
 
 -module(jqrealtime_web).
 -author("Simon Lamellière <simon@lamellie.re>").
-
 -export([start/1, stop/0, loop/2]).
 
-%% External API
+%% MySQL Configuration
+-define(MYSQL_SERVER, "localhost").
+-define(MYSQL_USER, "root").
+-define(MYSQL_PASSWD, "").
+-define(MYSQL_TABLE, "jqrealtime").
+-define(MYSQL_PORT, 3306).
 
+%% External API
 start(Options) ->
     {DocRoot, Options1} = get_option(docroot, Options),
     Loop = fun (Req) ->
                    ?MODULE:loop(Req, DocRoot)
            end,
+    
+    % start mysql
+    application:start(emysql),
+    emysql:add_pool(myjqrealtime, 1, ?MYSQL_USER, ?MYSQL_PASSWD, ?MYSQL_SERVER, ?MYSQL_PORT, ?MYSQL_TABLE, utf8),
+
+    % start mochiweb
     mochiweb_http:start([{name, ?MODULE}, {loop, Loop} | Options1]).
 
 stop() ->
@@ -27,7 +38,7 @@ loop(Req, DocRoot) ->
             Method when Method =:= 'GET'; Method =:= 'HEAD' ->
                 case Path of
                     "poll" ->
-                        jqrealtime_poller:wait(Req);
+                        jqrealtime_poller:wait(Req, integer_to_list(2));
                     _ ->
                         Req:serve_file(Path, DocRoot)
                 end;
@@ -48,7 +59,7 @@ loop(Req, DocRoot) ->
             error_logger:error_report(Report),
             %% NOTE: mustache templates need \ because they are not awesome.
             Req:respond({500, [{"Content-Type", "text/plain"}],
-                         "request failed, sorry\n"})
+                         "An error has occured. Please try again later.\n"})
     end.
 
 %% Internal API

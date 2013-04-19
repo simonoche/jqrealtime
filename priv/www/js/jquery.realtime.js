@@ -3,16 +3,19 @@
  * @author Simon Lamellière
  */
 
+// Our poller unique id
+var poller_session = new Date().getTime();
+var poller_max_processes = 3;
+var poller_processes = 0;
+var poller_timeout = 35000;
+var poller_requests = 0;
+
+// Poller URL
+var poller_server = "/poll";
+
+// Poller
 jQuery(document).ready(function()
 {
-	// Our poller unique id
-	var poller_session = new Date().getTime();
-	var poller_max_processes = 3;
-	var poller_processes = 0;
-
-	// Poller URL
-	var poller_server = "/poll";
-
 	/* Worketer Realtime */
 	$("body")
 		.bind("message", function(event, message){})
@@ -41,12 +44,14 @@ jQuery(document).ready(function()
 			// Poll	
 			$.ajax(
 			{
+				async: true,
 				url: poller_server,
 				dataType: "json",
 				method: "get",
-				timeout: 35000,
-				data: { 
-					id: poller_session 
+				timeout: poller_timeout,
+				data: {
+					n: poller_requests++,
+					id: poller_session
 				},
 				success: function(data)
 				{
