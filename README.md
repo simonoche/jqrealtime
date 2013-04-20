@@ -60,10 +60,11 @@ Cloning into 'emysql'...
 ... etc
 ```
 
-- You can now start the webserver by execution start-dev.sh (or use start-deamon.sh to detach it from console)
+- You can now start the webserver by execution start-dev.sh (or use start-daemon.sh to detach it from console)
 
 ```bash
 ./start-dev.sh
 ```
 
+- Your webserver is at http://localhost:8080/, but you can configure the port or the IP in src/jqrealtime_sup.erl
 
