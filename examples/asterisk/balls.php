@@ -13,63 +13,63 @@
         @purpose:
         Caller can move balls on a webpage with phone digits (DTMF)
         (useless, but fun...)
-
+        
+        Simply make a symbolic link of this in /var/lib/asterisk/agi-bin/
+        Ensure asterisk has permission to execute and read this AGI file
     **/
 
-    // !!!!!! TODO (example not working yet)
-	require_once "phpagi.php";
-    require_once "../php/lib/jqrealtime.class.php";
-
-	$agi = new AGI();
-
-	// Unique ID of call
-	$test = $agi->get_variable("UNIQUEID");
-	$test = $test['data'];
-	define("UNIQUEID", $test);
-
-	// Callerid
-	$test = $agi->get_variable("CALLERID(num)");
-	$test = $test['data'];
-	define("CALLERID", $test);
+	require_once "/var/lib/asterisk/agi-bin/phpagi.php";
+    require_once dirname(__FILE__) . "/../php/lib/jqrealtime.class.php";
 
     // 
-	$bid = file_get_contents("/var/lib/asterisk/agi-bin/balls");
-	$bIDD = (int) $bid + 1;
+	$agi = new AGI();
+    $i = 0;
 
-	file_put_contents("/var/lib/asterisk/agi-bin/balls", $bIDD);
+    // Create a new ball
+    $bid = 100;
 
-
+    // Tell the ball number
 	$agi->stream_file("fr/the-new-number-is");
-	$agi->say_number($bIDD);
+	$agi->say_number($bid);
+
+    // Execute our loop
 	ball();
 
-	$i=0;
-
+    // Func loop
     function ball()
     {
         global $agi, $bIDD, $i;
+
+        // Get digits
         $cd1 = $agi->get_data("silence/1", 7000, 1);
 
         if(trim($cd1["result"]))
         {
             $i=0;
-            $result = file_get_contents("http://localhost:8000/34psend?bid=".$bIDD."&digit=" . $cd1["result");
-            $check = json_decode($result);
+
+            // Push Ball State
+            jqRealtime::push("all", array("astball" => 
+                array(
+                   "ballid" => $bid,
+                   "digit" => (string) $cd1["result"]
+                )
+            ));
         }
         else
         {
+            // We wait too much
             if(++$i > 4)
             {
-                    $agi->hangup();
-                    exit;
+                // Hangup now
+                $agi->hangup();
+                exit;
             }
         }
 
         ball();
     }
 
-    file_get_contents("http://localhost:8000/34pbye?sender=".md5(CALLERID));
-
+    // We always hangup
     $agi->hangup();
 
 ?>

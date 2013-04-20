@@ -8,10 +8,14 @@
    License, or (at your option) any later version.
 **/
 
-body { padding: 0; margin: 0; }
+body { font-family: Helvetica, Arial, sans-serif; padding: 0; margin: 0; }
 
 .cookie_error { display: none; position: fixed; padding: 30px; font-size: 20px; background :red; color: #fff; width: 300px; }
 
 .pollbar { padding: 20px; background: #ccc; }
 .pollbar div { padding: 4px; display: inline-block; margin-right: 20px; background: #fff; border: 1px solid #aaa; }
 .data { position: relative; margin: 20px auto; padding: 10px; border: 2px solid red; height: 400px; width: 800px; overflow: auto; }
+
+/** Asterisk Balls **/
+.ball { top: 60px; left: 60px; text-align: center; position: relative; border: 1px solid #ccc; z-index: 10; }
+.ball span { display: block; padding-top: 30px; font-weight: bold; font-size: 30px; }

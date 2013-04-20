@@ -1,4 +1,4 @@
-<?php require("config.inc.php"); ?>
+<?php require("config.inc.php"); require("lib/bootstrap.php") ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
 <head>
@@ -38,6 +38,10 @@
 	<script type="text/javascript">
 		// Your Config (change it if needed)
 		var poller_server = "http://realtime.dev:8080/poll";
+		var poller_start_with = 3;
+		var poller_trigger = function(data){
+			$(".data").prepend(new Date() + " : " + data.realtime.message + " <br/>");
+		};
 	</script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="js/jquery.realtime.js"></script>

@@ -17,13 +17,16 @@ var poller_requests = 0;
 var is_identified = true;
 
 // Start poller
-jQuery(window).load(function(){
-
+jQuery(window).load(function()
+{
 	// Launch first processus
-	window.setTimeout(function(){
-		$("body").triggerHandler("poll");
-	}, 100); // avoid loader is visible on some browsers
-
+	for(i=0; i<poller_start_with; i++)
+	{
+		window.setTimeout(function()
+		{
+			$("body").triggerHandler("poll");
+		}, (i?(500*i):100));
+	}
 });
 
 // Poller
@@ -54,7 +57,7 @@ jQuery(document).ready(function()
 		.bind("dispatch", function(event, data)
 		{
 			// Do whatever you want with data
-			$(".data").prepend(new Date() + " : " + data.realtime.message + " <br/>");
+			poller_trigger(data);
 		})
 		.bind("poll", function(event)
 		{
