@@ -31,3 +31,29 @@ erl
 ```
   
 - Set up the database (you'll find the SQL schema at docs/schema.sql)
+
+- Configure the database credentials in src/jqrealtime_web.erl :
+
+```bash
+%% MySQL Configuration
+-define(MYSQL_SERVER, "localhost").
+-define(MYSQL_USER, "root").
+-define(MYSQL_PASSWD, "").
+-define(MYSQL_TABLE, "jqrealtime").
+-define(MYSQL_PORT, 3306).
+```
+
+- Now make the project :
+
+```bash
+# make
+==> mochiweb (get-deps)
+==> emysql (get-deps)
+==> jqrealtime (get-deps)
+==> mochiweb (compile)
+Compiled src/reloader.erl
+Compiled src/mochiweb_socket_server.erl
+Compiled src/mochiweb_util.erl
+...
+... etc
+
