@@ -38,7 +38,9 @@ loop(Req, DocRoot) ->
             Method when Method =:= 'GET'; Method =:= 'HEAD' ->
                 case Path of
                     "poll" ->
-                        jqrealtime_poller:wait(Req, integer_to_list(2));
+                        jqrealtime_poller:wait(Req);
+                    "call" ->
+                        jqrealtime_poller:send(Req);
                     _ ->
                         Req:serve_file(Path, DocRoot)
                 end;
@@ -66,17 +68,3 @@ loop(Req, DocRoot) ->
 
 get_option(Option, Options) ->
     {proplists:get_value(Option, Options), proplists:delete(Option, Options)}.
-
-%%
-%% Tests
-%%
--ifdef(TEST).
--include_lib("eunit/include/eunit.hrl").
-
-you_should_write_a_test() ->
-    ?assertEqual(
-       "No, but I will!",
-       "Have you written any tests?"),
-    ok.
-
--endif.
