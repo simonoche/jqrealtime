@@ -1,5 +1,6 @@
 <?php
 
+	require "config.inc.php";
 	require "lib/jqrealtime.class.php";
 
 	// Send message ?
