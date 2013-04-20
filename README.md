@@ -7,8 +7,9 @@ This project is **open-source (GNU AGPL)**, so you can use it freely.
 How to Install ?
 ------------
 
-- Install Erlang OTP on your computer : http://www.erlang.org/
-- Compile and install it :
+- Install Erlang OTP on your computer (download a version from http://www.erlang.org/), like R16B.
+
+- Compile and install Erlang OTP :
 
 ```bash
 wget http://www.erlang.org/download/otp_src_R16B.tar.gz
@@ -17,14 +18,14 @@ cd otp_src_R16B
 ./configure
 ```
 
-- At this point, check if all dependencies are satisfied, then :
+- At this step (./configure), check if all dependencies are satisfied, then make & make install erlang :
 
 ```bash
 make
 make install
 ```
 
-- Now erlang should be placed in /usr/bin/local, you can open the erlang console by typing :
+- Now erlang should be located in /usr/bin/local, you can open the erlang console by typing in your shell :
 
 ```bash
 erl
@@ -43,24 +44,24 @@ erl
 -define(MYSQL_PORT, 3306).
 ```
 
-- Now make the project :
+- Now make jqRealtime :
 
 ```bash
-# make
-==> jqrealtime (get-deps)
-Pulling mochiweb from {git,"git://github.com/mochi/mochiweb.git",
+make
+  ==> jqrealtime (get-deps)
+  Pulling mochiweb from {git,"git://github.com/mochi/mochiweb.git",
+                             {branch,"master"}}
+  Cloning into 'mochiweb'...
+  Pulling emysql from {git,"git://github.com/Eonblast/Emysql.git",
                            {branch,"master"}}
-Cloning into 'mochiweb'...
-Pulling emysql from {git,"git://github.com/Eonblast/Emysql.git",
-                         {branch,"master"}}
-Cloning into 'emysql'...
-==> mochiweb (get-deps)
-==> emysql (get-deps)
-...
-... etc
+  Cloning into 'emysql'...
+  ==> mochiweb (get-deps)
+  ==> emysql (get-deps)
+  ...
+  ... etc
 ```
 
-- You can now start the webserver by execution start-dev.sh (or use start-daemon.sh to detach it from console)
+- You can now start the webserver with start-dev.sh (or use start-daemon.sh to detach it from console)
 
 ```bash
 ./start-dev.sh
