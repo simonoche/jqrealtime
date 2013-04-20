@@ -80,3 +80,8 @@ Notes
 ------------
 
 - jqRealtime allows a user to have multiple sessions (cookies), or multiple tabs opened on his browser. If you broadcast a message to a user, he will receive it everywhere.
+
+TODO
+------------
+
+- Todo here :)
