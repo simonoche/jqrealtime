@@ -91,6 +91,11 @@ curl -X POST \
 
 - **Important** : You have to set a cookie named "jqr", and declare it's value in the table sessions, with a user ID.
 
+Examples
+------------
+
+- Check the "examples" directory.
+
 Notes
 ------------
 
