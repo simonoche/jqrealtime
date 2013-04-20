@@ -37,7 +37,7 @@
 	</div>
 	<script type="text/javascript">
 		// Your Config (change it if needed)
-		var poller_server = "http://realtime.dev:8080/poll";
+		var poller_server = "<?php echo $jqrealtime["poller"]; ?>";
 		var poller_start_with = 3;
 		var poller_trigger = function(data){
 			$(".data").prepend(new Date() + " : " + data.realtime.message + " <br/>");
