@@ -71,13 +71,13 @@ send(Req) ->
             false;
         _ ->
             [begin
-                %% Find Process & broadcast
+                %% Broadcast each process found
                 Process = list_to_pid(binary_to_list(Record#pids.pid)),
 
                 %% RMV Process
                 rmv_pr(integer_to_list(Record#pids.id)),
 
-                %% Broadcast
+                %% Broadcast data
                 Process ! {UserData}
             end || Record <- Records],
             true
