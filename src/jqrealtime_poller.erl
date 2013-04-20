@@ -5,7 +5,7 @@
 
 -module(jqrealtime_poller).
 -author("Simon Lamellière <simon@lamellie.re>").
--export([display/1, wait/1, send/1, poll/1, check_session/1]).
+-export([display/1, getclean/1, wait/1, send/1, poll/1, check_session/1]).
 
 %% Poller Config
 -define(TIMEOUT, 30000).
@@ -24,12 +24,11 @@ display(Session) ->
 %% Check session util
 check_session(Req) ->
 
-    %% Parse QS
     CheckSession = emysql:execute(myjqrealtime, 
         lists:concat([
             "SELECT * FROM sessions WHERE cookie = ", 
-            emysql_util:quote(Req:get_cookie_value("jqr"),
-            " LIMIT 1")
+            emysql_util:quote(?MODULE:getclean(Req:get_cookie_value("jqr"))),
+            " LIMIT 1"
         ]
     )),
 
@@ -77,7 +76,7 @@ wait(Req) ->
             emysql:execute(myjqrealtime,
                 lists:concat([
                     "INSERT INTO processes SET user_id = ", emysql_util:quote(UserId),
-                    ", browser_session = ", emysql_util:quote(proplists:get_value("id", QueryString)), 
+                    ", browser_session = ", emysql_util:quote(?MODULE:getclean(proplists:get_value("id", QueryString))), 
                     ", pid = ", emysql_util:quote(Proc),
                     ", security = ", round(random:uniform()*1000000),
                     ", end_at = ", emysql_util:quote(lists:concat([Y,"-",M,"-",D," ",H,":",I,":",S]))
@@ -88,7 +87,7 @@ wait(Req) ->
             Listener;
         false ->
             Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {session, <<"false">> }, {timeout, <<"false">> }, {realtime, {} } ]
+                struct, [ {session, false}, {timeout, false}, {realtime, {} } ]
                 })])
             })
     end.
@@ -104,9 +103,9 @@ poll(Req) ->
                             struct, [ 
                             { 
                                 <<"session">>, 
-                                    [<<"true">>],
+                                    true,
                                 <<"timeout">>, 
-                                    [<<"false">>],
+                                    false,
                                 <<"realtime">>, 
                                     [list_to_binary(DataType), list_to_binary(DataText)]
                             }
@@ -118,7 +117,13 @@ poll(Req) ->
 
     after ?TIMEOUT ->
         Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-            struct, [ {session, <<"true">> }, {timeout, <<"true">> }, {realtime, {} } ]
+            struct, [ {session, true}, {timeout, true}, {realtime, {}} ]
             })])
         })
     end.
+
+%% Get Value or "" if undefined
+getclean(X) when X /= undefined ->
+    X;
+getclean(_) ->
+    "".

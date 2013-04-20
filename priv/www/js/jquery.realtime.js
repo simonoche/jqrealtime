@@ -20,23 +20,16 @@ jQuery(document).ready(function()
 	$("body")
 		.bind("message", function(event, message){})
 		.bind("error", function(event, message){})
-		.bind("append", function(event, message){})
 		.bind("dispatch", function(event, data)
 		{
-			// Continue polling
-			$("body").triggerHandler("poll");
-
-			// Go
-			console.log(data);
+			// Do whatever you want with data
+			$(".data").append("Message " + data.realtime.message + " <br/>");
 		})
 		.bind("poll", function(event)
 		{
 			// Check current number of processes
 			if(poller_processes >= poller_max_processes)
-			{
-				console.log("Max Processes Reached");
 				return false;
-			}
 
 			// Increment our requests
 			poller_processes++;
@@ -58,14 +51,21 @@ jQuery(document).ready(function()
 					// Process ended
 					poller_processes--;
 
+					// Continue Polling
+					$("body").triggerHandler("poll");
+
 					// Dispatch Data to our controller
-					$("body").triggerHandler("dispatch", data);
+					if(data.timeout !== true)
+						$("body").triggerHandler("dispatch", data);
 				},
 				error: function()
 				{
 					// Process ended
 					poller_processes--;
 
+					// Continue Polling
+					$("body").triggerHandler("poll");
+					
 					// Nothing to dispatch due to an error
 					$("body").triggerHandler("dispatch", -1);
 				}
