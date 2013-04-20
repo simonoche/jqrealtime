@@ -17,14 +17,6 @@
         Simply make a symbolic link of this and kill-ball.php in /var/lib/asterisk/agi-bin/
         Ensure asterisk has permission to execute and read this AGI file
 
-        In Your dialplan (such as extensions.conf or extensions_custom.conf)
-        do something like that : 
-
-        [from-internal-xfer]
-        exten => 188,1,Answer
-        exten => 188,n,AGI(balls.php)
-        exten => 188,n,Hangup
-        exten => h,1,AGI(kill-ball.php)
     **/
 
     // Include configuration

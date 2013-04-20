@@ -28,7 +28,7 @@
     **/
 
     // Include configuration
-	require_once "/var/lib/asterisk/agi-bin/phpagi.php";
+    require_once "/var/lib/asterisk/agi-bin/phpagif.php";
     require_once dirname(__FILE__) . "/../php/config.inc.php";
     require_once dirname(__FILE__) . "/../php/lib/jqrealtime.class.php";
 
@@ -55,16 +55,16 @@
     ));
 
     // Tell the ball number
-	// $agi->stream_file("fr/the-new-number-is");
-	$agi->say_number($bid);
-
+    // $agi->stream_file("fr/the-new-number-is");
+    $agi->say_number($bid);
+    
     // Execute our loop
-	ball();
+    ball();
 
     // Func loop
     function ball()
     {
-        global $agi, $bid, $guid, $i;
+        global $agi, $jqrealtime, $bid, $guid, $i;
 
         // Get digits
         $cd1 = $agi->get_data("silence/1", 7000, 1);
@@ -83,17 +83,7 @@
                 )
             ));
         }
-        else
-        {
-            // We wait too much
-            if(++$i > 4)
-            {
-                // Hangup now
-                $agi->hangup();
-                exit;
-            }
-        }
-
+ 
         ball();
     }
 
