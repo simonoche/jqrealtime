@@ -4,6 +4,13 @@ jqRealtime
 And erlang realtime http server (mysql, mochiweb, jQuery)
 This project is **open-source (GNU AGPL)**, so you can use it freely.
 
+What for ?
+------------
+
+- jqRealtime could be usefull for realtime web applications. It's just a basic "gateway" which dispatch data. 
+
+- You can create your own applications, in the language of your choice, and build online chat, collaborative work tools, and so on...
+
 How to Install ?
 ------------
 
