@@ -15,9 +15,6 @@
 
 class jqRealtime
 {
-	static $pusher = "http://localhost:8080/push";
-	static $token = "bf3cc858ce88c3fcebcf3e7c691983a28b8dabba";
-
 	static function push_all($data)
 	{
 		self::push("all", $data);
@@ -25,16 +22,18 @@ class jqRealtime
 
 	static function push($user_id, $data)
 	{
+		global $jqrealtime;
+
 		// Prepare data
 		$data = array(
-			"token" => self::$token,
+			"token" => $jqrealtime["token"],
 			"uid" => $user_id,
 			"data" => json_encode($data)
 		);
 
 		// Curl it
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, self::$pusher);
+		curl_setopt($ch, CURLOPT_URL, $jqrealtime["pusher"]);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
