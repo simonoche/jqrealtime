@@ -19,9 +19,9 @@
 -record(pids, {id, user_id, pid, browser_session, security, created_at, end_at}).
 
 %% Debug
--record(result_packet, {seq_num, field_list, rows, extra}).
--record(ok_packet, {seq_num, affected_rows, insert_id, status, warning_count, msg}).
--record(error_packet, {seq_num, code, msg}).
+% -record(result_packet, {seq_num, field_list, rows, extra}).
+% -record(ok_packet, {seq_num, affected_rows, insert_id, status, warning_count, msg}).
+% -record(error_packet, {seq_num, code, msg}).
 
 %% Check session util
 check_session(Req) ->
