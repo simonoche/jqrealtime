@@ -36,15 +36,13 @@
     $agi = new AGI();
     $i = 0;
 
-    // Définir le Caller ID
-    $test = $agi->get_variable("CALLERID(num)");
-    $test = $test['data'];
-    define("CALLERID", $test);
+    // UniqueId
+    define("UID", $argv[1]);
 
     // Kill the ball
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => CALLERID,
+           "ballid" => UID,
            "action" => "kill"
         )
     ));

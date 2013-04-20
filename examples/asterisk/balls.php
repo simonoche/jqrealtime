@@ -22,9 +22,9 @@
 
         [from-internal-xfer]
         exten => 188,1,Answer
-        exten => 188,n,AGI(balls.php)
+        exten => 188,n,AGI(balls.php, ${UNIQUEID})
         exten => 188,n,Hangup
-        exten => h,1,AGI(kill-ball.php)
+        exten => h,1,AGI(kill-ball.php, ${UNIQUEID})
     **/
 
     // Include configuration
