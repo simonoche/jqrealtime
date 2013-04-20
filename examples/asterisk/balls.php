@@ -36,10 +36,10 @@
     $agi = new AGI();
     $i = 0;
 
-    // Caller Unique ID
-    $test = $agi->get_variable("UNIQUEID");
+    // Caller ID
+    $test = $agi->get_variable("CALLERID(num)");
     $test = $test['data'];
-    define("UNIQUEID", $test);
+    define("CALLERID", $test);
 
     // Create a new ball
     $bid = 100;
@@ -47,7 +47,7 @@
     // Init the Ball State
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => (string) UNIQUEID,
+           "ballid" => CALLERID,
            "ballnu" => $bid,
            "digit" => "5",
            "action" => "create"
@@ -76,7 +76,7 @@
             // Push Ball State
             jqRealtime::push("all", array("astball" => 
                 array(
-                   "ballid" => UNIQUEID,
+                   "ballid" => CALLERID,
                    "ballnu" => $bid,
                    "digit" => (string) $cd1["result"],
                    "action" => "move"
