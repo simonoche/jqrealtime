@@ -28,7 +28,7 @@
     **/
 
     // Include configuration
-	require_once "/var/lib/asterisk/agi-bin/phpagi.php";
+    require_once "/var/lib/asterisk/agi-bin/phpagi.php";
     require_once dirname(__FILE__) . "/../php/config.inc.php";
     require_once dirname(__FILE__) . "/../php/lib/jqrealtime.class.php";
 
@@ -37,12 +37,12 @@
     $i = 0;
 
     // UniqueId
-    define("UID", $argv[1]);
+    $uid = $argv[1];
 
     // Kill the ball
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => UID,
+           "ballid" => $uid,
            "action" => "kill"
         )
     ));

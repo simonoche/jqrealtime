@@ -37,7 +37,7 @@
     $i = 0;
 
     // UniqueId
-    define("UID", $argv[1]);
+    $uid = $argv[1];
 
     // Find a new ball id
     $count = (int) file_get_contents(dirname(__FILE__)."/ball_count.txt");
@@ -47,7 +47,7 @@
     // Init the Ball State
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => UID,
+           "ballid" => $uid,
            "ballnu" => $bid,
            "digit" => "5",
            "action" => "create"
@@ -64,7 +64,7 @@
     // Func loop
     function ball()
     {
-        global $agi, $bid, $i;
+        global $agi, $bid, $uid, $i;
 
         // Get digits
         $cd1 = $agi->get_data("silence/1", 7000, 1);
@@ -76,7 +76,7 @@
             // Push Ball State
             jqRealtime::push("all", array("astball" => 
                 array(
-                   "ballid" => UID,
+                   "ballid" => $uid,
                    "ballnu" => $bid,
                    "digit" => (string) $cd1["result"],
                    "action" => "move"
