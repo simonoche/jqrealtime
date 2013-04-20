@@ -1,7 +1,12 @@
-/*
- * jQuery Realtime
- * @author Simon Lamellière
- */
+/**
+   jqRealtime <https://github.com/simonoche/jqrealtime>
+   Copyright (C) 2013 Simon Lamellière <simon@lamellie.re>
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+**/
 
 // Our poller unique id
 var poller_session = String(new Date().getTime()).substr(5,8);
@@ -11,8 +16,15 @@ var poller_timeout = 35000;
 var poller_requests = 0;
 var is_identified = true;
 
-// Poller URL
-var poller_server = "/poll";
+// Start poller
+jQuery(window).load(function(){
+
+	// Launch first processus
+	window.setTimeout(function(){
+		$("body").triggerHandler("poll");
+	}, 100); // avoid loader is visible on some browsers
+
+});
 
 // Poller
 jQuery(document).ready(function()
@@ -105,7 +117,4 @@ jQuery(document).ready(function()
 				}
 			});
 		});
-
-	// Launch first processus
-	$("body").triggerHandler("poll");
 });

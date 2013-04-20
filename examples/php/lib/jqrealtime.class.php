@@ -52,9 +52,4 @@ class jqRealtime
 	}
 }
 
-// Test our class
-var_dump( 
-	jqRealtime::push(1, array("message" => "Hello, World!"))
-);
-
 ?>
