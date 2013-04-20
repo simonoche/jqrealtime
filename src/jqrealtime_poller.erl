@@ -5,7 +5,7 @@
 
 -module(jqrealtime_poller).
 -author("Simon Lamellière <simon@lamellie.re>").
--export([display/1, getclean/1, wait/1, send/1, poll/1, check_session/1]).
+-export([rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
 
 %% Poller Config
 -define(TIMEOUT, 30000).
@@ -18,12 +18,15 @@
 -record(sessions, {id, user_id, cookie}).
 -record(pids, {id, user_id, pid, browser_session, security, created_at, end_at}).
 
-display(Session) ->
-    io:format("User cookie is ~p~n",[Session]).
+%% Debug
+-record(result_packet, {seq_num, field_list, rows, extra}).
+-record(ok_packet, {seq_num, affected_rows, insert_id, status, warning_count, msg}).
+-record(error_packet, {seq_num, code, msg}).
 
 %% Check session util
 check_session(Req) ->
 
+    %% Check session
     CheckSession = emysql:execute(myjqrealtime, 
         lists:concat([
             "SELECT * FROM sessions WHERE cookie = ", 
@@ -47,8 +50,42 @@ check_session(Req) ->
 
 %% Call a process and Send Data
 send(Req) ->
+
+    %% Parse QS & Get Json Data to send
+    QueryString = Req:parse_qs(),
+    UserData = ?MODULE:getclean(proplists:get_value("data", QueryString)),
+    UserId = ?MODULE:getclean(proplists:get_value("uid", QueryString)),
+
+    %% rmv outdated
+    ?MODULE:rmv_old_pr(),
+    
+    %% Get All Unique processes (if more than one page opened)
+    CheckPids = emysql:execute(myjqrealtime, lists:concat(["SELECT * FROM (SELECT * FROM `processes` WHERE user_id = ", emysql_util:quote(UserId), " ORDER BY end_at DESC) as Sub GROUP BY Sub.browser_session"])),
+
+    %% Convert to erlang records
+    Records = emysql_util:as_record(CheckPids, pids, record_info(fields, pids)),
+
+    %% dispatch data
+    Result = case length(Records) of
+        0 ->
+            false;
+        _ ->
+            [begin
+                %% Find Process & broadcast
+                Process = list_to_pid(binary_to_list(Record#pids.pid)),
+
+                %% RMV Process
+                rmv_pr(integer_to_list(Record#pids.id)),
+
+                %% Broadcast
+                Process ! {UserData}
+            end || Record <- Records],
+            true
+    end,
+
+    %% Respond
     Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {dispatch, <<"true">> } ]
+                struct, [ {dispatch, Result} ]
                 })])
             }).
     
@@ -65,8 +102,8 @@ wait(Req) ->
             Listener = spawn(?MODULE, poll, [Req]),
             Proc = erlang:pid_to_list(Listener),
 
-            %% Remove outdated processes
-            emysql:execute(myjqrealtime, <<"DELETE FROM processes WHERE end_at < NOW()">>),
+            %% rmv outdated
+            ?MODULE:rmv_old_pr(),
 
             %% Calculate process death
             CurrentTime = calendar:datetime_to_gregorian_seconds(calendar:local_time()),
@@ -92,26 +129,22 @@ wait(Req) ->
             })
     end.
 
+%% Remove particular process
+rmv_pr(ProcessId) ->
+    emysql:execute(myjqrealtime, lists:concat(["DELETE FROM processes WHERE id = ", ProcessId])).
+
+%% Remove Old Processes
+rmv_old_pr() ->
+    %% Remove outdated processes
+    emysql:execute(myjqrealtime, <<"DELETE FROM processes WHERE end_at < NOW()">>).
+
 %% Long Polling
 poll(Req) ->
     receive
-        {DataType, DataText} ->
-            io:format("Process ended"),
-            Req:ok({"text/javascript", ?HEADERS, 
-                lists:concat([
-                    mochijson2:encode({
-                            struct, [ 
-                            { 
-                                <<"session">>, 
-                                    true,
-                                <<"timeout">>, 
-                                    false,
-                                <<"realtime">>, 
-                                    [list_to_binary(DataType), list_to_binary(DataText)]
-                            }
-                        ]
-                    }) 
-                ])
+        {DataJson} ->
+            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
+                struct, [ {session, false}, {timeout, false}, {realtime, mochijson2:decode(DataJson)} ]
+                })])
             }),
             stop
 

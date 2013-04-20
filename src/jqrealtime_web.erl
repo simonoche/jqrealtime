@@ -39,7 +39,7 @@ loop(Req, DocRoot) ->
                 case Path of
                     "poll" ->
                         jqrealtime_poller:wait(Req);
-                    "call" ->
+                    "push" ->
                         jqrealtime_poller:send(Req);
                     _ ->
                         Req:serve_file(Path, DocRoot)
