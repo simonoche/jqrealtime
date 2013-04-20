@@ -47,13 +47,23 @@ erl
 
 ```bash
 # make
+==> jqrealtime (get-deps)
+Pulling mochiweb from {git,"git://github.com/mochi/mochiweb.git",
+                           {branch,"master"}}
+Cloning into 'mochiweb'...
+Pulling emysql from {git,"git://github.com/Eonblast/Emysql.git",
+                         {branch,"master"}}
+Cloning into 'emysql'...
 ==> mochiweb (get-deps)
 ==> emysql (get-deps)
-==> jqrealtime (get-deps)
-==> mochiweb (compile)
-Compiled src/reloader.erl
-Compiled src/mochiweb_socket_server.erl
-Compiled src/mochiweb_util.erl
 ...
 ... etc
+```
+
+- You can now start the webserver by execution start-dev.sh (or use start-deamon.sh to detach it from console)
+
+```bash
+./start-dev.sh
+```
+
 
