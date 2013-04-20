@@ -49,6 +49,12 @@
 				var ball = $("#ball-"+data.realtime.astball.ballid);
 				var ratio = 50;
 
+				if(data.realtime.astball.action == "kill")
+				{
+					ball.fadeOut();
+					return false;
+				}
+
 				// Move the ball
 				switch(data.realtime.astball.digit)
 				{

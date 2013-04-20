@@ -22,9 +22,14 @@
 
         [from-internal-xfer]
         exten => 188,1,Answer
-        exten => 188,n,AGI(balls.php, ${UNIQUEID})
+        exten => 188,n,Goto(jq-balls,s,1)
         exten => 188,n,Hangup
+
+        [jq-balls]
+        exten => s,1,AGI(balls.php, ${UNIQUEID})
+        exten => s,n,Hangup
         exten => h,1,AGI(kill-ball.php, ${UNIQUEID})
+
     **/
 
     // Include configuration
