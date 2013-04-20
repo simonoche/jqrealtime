@@ -41,61 +41,13 @@
     $test = $test['data'];
     define("UNIQUEID", $test);
 
-    // Create a new ball
-    $bid = 100;
-
-    // Init the Ball State
+    // Kill the ball
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => (string) UNIQUEID,
-           "ballnu" => $bid,
-           "digit" => "5",
-           "action" => "create"
+           "ballid" => UNIQUEID,
+           "action" => "kill"
         )
     ));
-
-    // Tell the ball number
-	// $agi->stream_file("fr/the-new-number-is");
-	$agi->say_number($bid);
-
-    // Execute our loop
-	ball();
-
-    // Func loop
-    function ball()
-    {
-        global $agi, $bid, $i;
-
-        // Get digits
-        $cd1 = $agi->get_data("silence/1", 7000, 1);
-
-        if(trim($cd1["result"]))
-        {
-            $i=0;
-
-            // Push Ball State
-            jqRealtime::push("all", array("astball" => 
-                array(
-                   "ballid" => UNIQUEID,
-                   "ballnu" => $bid,
-                   "digit" => (string) $cd1["result"],
-                   "action" => "move"
-                )
-            ));
-        }
-        else
-        {
-            // We wait too much
-            if(++$i > 4)
-            {
-                // Hangup now
-                $agi->hangup();
-                exit;
-            }
-        }
-
-        ball();
-    }
 
     // We always hangup
     $agi->hangup();
