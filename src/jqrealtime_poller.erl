@@ -143,7 +143,7 @@ poll(Req) ->
     receive
         {DataJson} ->
             Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {session, false}, {timeout, false}, {realtime, mochijson2:decode(DataJson)} ]
+                struct, [ {session, true}, {timeout, false}, {realtime, mochijson2:decode(DataJson)} ]
                 })])
             }),
             stop

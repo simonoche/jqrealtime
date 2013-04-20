@@ -1,5 +1,7 @@
 body { padding: 0; margin: 0; }
 
+.cookie_error { position: fixed; padding: 30px; font-size: 20px; background :red; color: #fff; width: 300px; }
+
 .pollbar { padding: 20px; background: #ccc; }
 .pollbar div { padding: 4px; display: inline-block; margin-right: 20px; background: #fff; border: 1px solid #aaa; }
 .data { position: relative; margin: 20px auto; padding: 10px; border: 2px solid red; height: 400px; width: 800px; overflow: auto; }

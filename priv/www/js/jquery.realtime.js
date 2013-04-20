@@ -9,6 +9,7 @@ var poller_max_processes = 3;
 var poller_processes = 0;
 var poller_timeout = 35000;
 var poller_requests = 0;
+var is_identified = true;
 
 // Poller URL
 var poller_server = "/poll";
@@ -71,6 +72,18 @@ jQuery(document).ready(function()
 				{
 					// Process ended
 					poller_processes--;
+
+					// Session problem ?
+					if(data.session === false)
+					{
+						$(".cookie_error").fadeIn();
+						is_identified = false;
+						return false;
+					}
+					else
+					{
+						$(".cookie_error").hide();
+					}
 
 					// Continue Polling
 					$("body").triggerHandler("poll");
