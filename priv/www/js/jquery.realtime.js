@@ -4,7 +4,7 @@
  */
 
 // Our poller unique id
-var poller_session = new Date().getTime();
+var poller_session = String(new Date().getTime()).substr(5,8);
 var poller_max_processes = 3;
 var poller_processes = 0;
 var poller_timeout = 35000;
@@ -41,7 +41,7 @@ jQuery(document).ready(function()
 		.bind("dispatch", function(event, data)
 		{
 			// Do whatever you want with data
-			$(".data").append(new Date() + " : " + data.realtime.message + " <br/>");
+			$(".data").prepend(new Date() + " : " + data.realtime.message + " <br/>");
 		})
 		.bind("poll", function(event)
 		{

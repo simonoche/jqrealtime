@@ -2,4 +2,4 @@ body { padding: 0; margin: 0; }
 
 .pollbar { padding: 20px; background: #ccc; }
 .pollbar div { padding: 4px; display: inline-block; margin-right: 20px; background: #fff; border: 1px solid #aaa; }
-.data { position: relative; margin: 20px auto; padding: 10px; border: 2px solid red; height: 200px; width: 800px; overflow: auto; }
+.data { position: relative; margin: 20px auto; padding: 10px; border: 2px solid red; height: 400px; width: 800px; overflow: auto; }
