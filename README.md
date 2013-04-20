@@ -74,4 +74,9 @@ Using jqRealtime
 
 - You can push data to a user by calling the pull controller : http://localhost:8080/push?uid=1&data={%22message%22:%22Hello%20World!%22}
 
-- **Important** : You have to set a cookie named "jqr", and declare it's value in the table sessions, with a user ID
+- **Important** : You have to set a cookie named "jqr", and declare it's value in the table sessions, with a user ID.
+
+Notes
+------------
+
+- jqRealtime allows a user to have multiple sessions (cookies), or multiple tabs opened on his browser. If you broadcast a message to a user, he will receive it everywhere.
