@@ -44,7 +44,7 @@ erl
 -define(MYSQL_PORT, 3306).
 ```
 
-- Now make jqRealtime :
+- Now make jqRealtime (dependencies (Mochiweb & Emysql) will be automatically downloaded & compiled) :
 
 ```bash
 make
