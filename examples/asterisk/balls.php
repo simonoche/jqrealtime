@@ -39,8 +39,10 @@
     // UniqueId
     define("UID", $argv[1]);
 
-    // Create a new ball
-    $bid = 100;
+    // Find a new ball id
+    $count = (int) file_get_contents(dirname(__FILE__)."/ball_count.txt");
+    file_put_contents(dirname(__FILE__)."/ball_count.txt", $count++);
+    $bid = $count;
 
     // Init the Ball State
     jqRealtime::push("all", array("astball" => 

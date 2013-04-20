@@ -105,7 +105,7 @@
 						.css("width", ballSize)
 						.css("border-radius", ballSize)
 						.css("background", randcolor())
-						.html("<span>" + data.realtime.astball.ballid + "</span>")
+						.html("<span>" + data.realtime.astball.ballnu + "</span>")
 					);
 			}
 		};
