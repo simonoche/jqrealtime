@@ -78,7 +78,7 @@ Using jqRealtime
 curl -X POST \
           -d "uid=1&data=%7B%22message%22%20%3A%20%22Hello%20World%22%7D" \
           http://localhost:8080/push
-```bash
+```
 
 - You can secure the pull controller by setting a secret key in jqrealtime_poller.erl (highly recommended) |  add token=YOUR_SECRET_KEY in the post parameters
 
