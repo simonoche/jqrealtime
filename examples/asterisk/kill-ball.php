@@ -42,7 +42,7 @@
     // Kill the ball
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => $uid,
+           "ballid" => md5($uid),
            "action" => "kill"
         )
     ));

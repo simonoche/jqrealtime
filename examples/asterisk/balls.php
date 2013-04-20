@@ -47,7 +47,7 @@
     // Init the Ball State
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => $uid,
+           "ballid" => md5($uid),
            "ballnu" => $bid,
            "digit" => "5",
            "action" => "create"
@@ -76,7 +76,7 @@
             // Push Ball State
             jqRealtime::push("all", array("astball" => 
                 array(
-                   "ballid" => $uid,
+                   "ballid" => md5($uid),
                    "ballnu" => $bid,
                    "digit" => (string) $cd1["result"],
                    "action" => "move"
