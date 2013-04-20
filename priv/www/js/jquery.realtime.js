@@ -61,7 +61,7 @@ jQuery(document).ready(function()
 			{
 				async: true,
 				url: poller_server,
-				dataType: "json",
+				dataType: "jsonp",
 				method: "get",
 				timeout: poller_timeout,
 				data: {

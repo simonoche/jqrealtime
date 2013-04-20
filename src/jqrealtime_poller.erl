@@ -5,7 +5,7 @@
 
 -module(jqrealtime_poller).
 -author("Simon Lamellière <simon@lamellie.re>").
--export([rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
+-export([respond/4, respond/3, rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
 
 %% Poller Config
 -define(TIMEOUT, 30000).
@@ -123,10 +123,7 @@ wait(Req) ->
             %% Execute our listener
             Listener;
         false ->
-            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {session, false}, {timeout, false}, {realtime, {} } ]
-                })])
-            })
+            ?MODULE:respond(Req, false, false)
     end.
 
 %% Remove particular process
@@ -142,18 +139,31 @@ rmv_old_pr() ->
 poll(Req) ->
     receive
         {DataJson} ->
-            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {session, true}, {timeout, false}, {realtime, mochijson2:decode(DataJson)} ]
-                })])
-            }),
+            ?MODULE:respond(Req, true, false, DataJson),
             stop
-
     after ?TIMEOUT ->
-        Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-            struct, [ {session, true}, {timeout, true}, {realtime, {}} ]
-            })])
-        })
+        ?MODULE:respond(Req, true, true)
     end.
+
+%% Generic Response
+respond(Req, Session, Timeout, DataJson) ->
+    Req:ok({"text/javascript", ?HEADERS, 
+        lists:concat([
+                getclean(proplists:get_value("callback", Req:parse_qs())),
+                "(", 
+                 mochijson2:encode({
+                    struct, [ 
+                        {session, Session}, 
+                        {timeout, Timeout}, 
+                        {realtime, mochijson2:decode(DataJson)}
+                    ]
+                }),
+                ")"
+            ])
+        }).
+
+respond(Req, Session, Timeout) ->
+    ?MODULE:respond(Req, Session, Timeout, binary_to_list(<<"{}">>)).
 
 %% Get Value or "" if undefined
 getclean(X) when X /= undefined ->
