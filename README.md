@@ -72,7 +72,15 @@ make
 Using jqRealtime
 ------------
 
-- You can push data to a user by calling the pull controller : http://localhost:8080/push?uid=1&data={%22message%22:%22Hello%20World!%22}
+- You can push data to a user by calling the pull controller (method POST). Here a basic example with a "Hello World" :
+
+```bash
+curl -X POST \
+          -d "uid=1&data=%7B%22message%22%20%3A%20%22Hello%20World%22%7D" \
+          http://localhost:8080/push
+```bash
+
+- You can secure the pull controller by setting a secret key in jqrealtime_poller.erl (highly recommended) |  add token=YOUR_SECRET_KEY in the post parameters
 
 - **Important** : You have to set a cookie named "jqr", and declare it's value in the table sessions, with a user ID.
 

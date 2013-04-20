@@ -5,11 +5,12 @@
 
 -module(jqrealtime_poller).
 -author("Simon Lamellière <simon@lamellie.re>").
--export([respond/4, respond/3, rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
+-export([valid_token/1, respond/4, respond/3, rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
 
 %% Poller Config
 -define(TIMEOUT, 30000).
 -define(HEADERS, [{"Pragma", "no-cache"},{"Expires", 0}, {"Cache-Control", "must-revalidate"},{"Cache-Control", "no-cache"},{"Cache-Control", "no-store"}]).
+-define(SECRET_KEY, <<"bf3cc858ce88c3fcebcf3e7c691983a28b8dabba">>).
 
 %% Macros
 -define(record_to_tuplelist(Rec, Ref), lists:zip(record_info(fields, Rec),tl(tuple_to_list(Ref)))).
@@ -51,44 +52,52 @@ check_session(Req) ->
 %% Call a process and Send Data
 send(Req) ->
 
-    %% Parse QS & Get Json Data to send
-    QueryString = Req:parse_post(),
-    UserData = getclean(proplists:get_value("data", QueryString)),
-    UserId = getclean(proplists:get_value("uid", QueryString)),
+    case valid_token(Req) of
+        false ->
+            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
+                            struct, [ {dispatch, -1} ]
+                            })])
+                        });
+        true ->
+            %% Parse QS & Get Json Data to send
+            QueryString = Req:parse_post(),
+            UserData = getclean(proplists:get_value("data", QueryString)),
+            UserId = getclean(proplists:get_value("uid", QueryString)),
 
-    %% rmv outdated
-    rmv_old_pr(),
-    
-    %% Get All Unique processes (if more than one page opened)
-    CheckPids = emysql:execute(myjqrealtime, lists:concat(["SELECT * FROM (SELECT * FROM `processes` WHERE user_id = ", emysql_util:quote(UserId), " ORDER BY end_at DESC) as Sub GROUP BY Sub.browser_session"])),
+            %% rmv outdated
+            rmv_old_pr(),
+            
+            %% Get All Unique processes (if more than one page opened)
+            CheckPids = emysql:execute(myjqrealtime, lists:concat(["SELECT * FROM (SELECT * FROM `processes` WHERE user_id = ", emysql_util:quote(UserId), " ORDER BY end_at DESC) as Sub GROUP BY Sub.browser_session"])),
 
-    %% Convert to erlang records
-    Records = emysql_util:as_record(CheckPids, pids, record_info(fields, pids)),
+            %% Convert to erlang records
+            Records = emysql_util:as_record(CheckPids, pids, record_info(fields, pids)),
 
-    %% dispatch data
-    Result = case length(Records) of
-        0 ->
-            false;
-        _ ->
-            [begin
-                %% Broadcast each process found
-                Process = list_to_pid(binary_to_list(Record#pids.pid)),
+            %% dispatch data
+            Result = case length(Records) of
+                0 ->
+                    false;
+                _ ->
+                    [begin
+                        %% Broadcast each process found
+                        Process = list_to_pid(binary_to_list(Record#pids.pid)),
 
-                %% RMV Process
-                rmv_pr(integer_to_list(Record#pids.id)),
+                        %% RMV Process
+                        rmv_pr(integer_to_list(Record#pids.id)),
 
-                %% Broadcast data
-                Process ! {UserData}
-            end || Record <- Records],
-            true
-    end,
+                        %% Broadcast data
+                        Process ! {UserData}
+                    end || Record <- Records],
+                    true
+            end,
 
-    %% Respond
-    Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
-                struct, [ {dispatch, Result} ]
-                })])
-            }).
-    
+            %% Respond
+            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
+                        struct, [ {dispatch, Result} ]
+                        })])
+                    })
+        end.
+
 %% Long Polling spawner
 wait(Req) ->
 
@@ -144,6 +153,18 @@ poll(Req) ->
     after ?TIMEOUT ->
         respond(Req, true, true)
     end.
+
+%% Check user token (pull func)
+valid_token(Req) ->
+    %% Putting an empty SECRET_KEY disable this security
+    %% It's highly recommanded to set your secret_key if you use this app in production mode
+    case list_to_binary(getclean(proplists:get_value("token", Req:parse_post()))) of
+        ?SECRET_KEY ->
+            true;
+        _ ->
+            false
+    end. 
+    %% curl -X POST -d "uid=1&data=%7B%22message%22%20%3A%20%22Hello%20World%22%7D&token=bf3cc858ce88c3fcebcf3e7c691983a28b8dabba" http://localhost:8080/push
 
 %% Generic Response of jqRealtime
 respond(Req, Session, Timeout, DataJson) ->
