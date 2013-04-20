@@ -16,12 +16,11 @@
 class jqRealtime
 {
 	static $pusher = "http://localhost:8080/push";
-	static $pusher_all = "http://localhost:8080/push_all";
 	static $token = "bf3cc858ce88c3fcebcf3e7c691983a28b8dabba";
 
 	static function push_all($data)
 	{
-		self::push(-1, $data);
+		self::push("all", $data);
 	}
 
 	static function push($user_id, $data)
@@ -35,7 +34,7 @@ class jqRealtime
 
 		// Curl it
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $user_id === - 1 ? self::$pusher_all : self::$pusher);
+		curl_setopt($ch, CURLOPT_URL, self::$pusher);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -57,7 +56,5 @@ class jqRealtime
 		return -1;
 	}
 }
-
-jqRealtime::push_all(array("message" => "bite"));
 
 ?>
