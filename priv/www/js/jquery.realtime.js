@@ -16,14 +16,32 @@ var poller_server = "/poll";
 // Poller
 jQuery(document).ready(function()
 {
-	/* Worketer Realtime */
+	/* Listeners */
+	$(document).on("click", ".jq_spawn", function(){
+		$("body").triggerHandler("poll");
+	});
+
+	$(document).on("click", ".jq_less", function(){
+		poller_max_processes--;
+		$("body").triggerHandler("update");
+	});
+
+	$(document).on("click", ".jq_more", function(){
+		poller_max_processes++;
+		$("body").triggerHandler("update");
+	});
+
+	/* Realtime */
 	$("body")
-		.bind("message", function(event, message){})
-		.bind("error", function(event, message){})
+		.bind("update", function(event, message)
+		{
+			$(".processes_limit span").text(poller_max_processes);
+			$(".processes span").text(poller_processes);
+		})
 		.bind("dispatch", function(event, data)
 		{
 			// Do whatever you want with data
-			$(".data").append("Message " + data.realtime.message + " <br/>");
+			$(".data").append(new Date() + " : " + data.realtime.message + " <br/>");
 		})
 		.bind("poll", function(event)
 		{
@@ -33,6 +51,9 @@ jQuery(document).ready(function()
 
 			// Increment our requests
 			poller_processes++;
+
+			// Update
+			$("body").triggerHandler("update");
 
 			// Poll	
 			$.ajax(
@@ -71,4 +92,7 @@ jQuery(document).ready(function()
 				}
 			});
 		});
+
+	// Launch first processus
+	$("body").triggerHandler("poll");
 });

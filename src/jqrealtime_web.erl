@@ -39,6 +39,7 @@ loop(Req, DocRoot) ->
                 case Path of
                     "poll" ->
                         jqrealtime_poller:wait(Req);
+                    %% todo: put func below in post
                     "push" ->
                         jqrealtime_poller:send(Req);
                     _ ->
