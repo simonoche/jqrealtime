@@ -37,12 +37,12 @@
     $i = 0;
 
     // UniqueId
-    $uid = $argv[1];
+    $guid = $argv[1];
 
     // Kill the ball
     jqRealtime::push("all", array("astball" => 
         array(
-           "ballid" => md5($uid),
+           "ballid" => md5($guid),
            "action" => "kill"
         )
     ));
