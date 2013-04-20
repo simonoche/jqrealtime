@@ -37,16 +37,19 @@ loop(Req, DocRoot) ->
         case Req:get(method) of
             Method when Method =:= 'GET'; Method =:= 'HEAD' ->
                 case Path of
+                    %% poll (require a valid auth cookie "jqr", and an entry in the sessions table)
+                    %% usage GET /poll?id=UNIQUE_ID&i=REQUEST_ID&callback=jsonpCallback
                     "poll" ->
                         jqrealtime_poller:wait(Req);
-                    %% todo: put func below in post
-                    "push" ->
-                        jqrealtime_poller:send(Req);
                     _ ->
                         Req:serve_file(Path, DocRoot)
                 end;
             'POST' ->
                 case Path of
+                    %% push data to a user
+                    %% usage POST /push?uid=USER_ID&data={json: json}
+                    "push" ->
+                        jqrealtime_poller:send(Req);
                     _ ->
                         Req:not_found()
                 end;

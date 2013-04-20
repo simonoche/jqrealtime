@@ -52,7 +52,7 @@ check_session(Req) ->
 send(Req) ->
 
     %% Parse QS & Get Json Data to send
-    QueryString = Req:parse_qs(),
+    QueryString = Req:parse_post(),
     UserData = getclean(proplists:get_value("data", QueryString)),
     UserId = getclean(proplists:get_value("uid", QueryString)),
 
