@@ -30,7 +30,7 @@ check_session(Req) ->
     CheckSession = emysql:execute(myjqrealtime, 
         lists:concat([
             "SELECT * FROM sessions WHERE cookie = ", 
-            emysql_util:quote(?MODULE:getclean(Req:get_cookie_value("jqr"))),
+            emysql_util:quote(getclean(Req:get_cookie_value("jqr"))),
             " LIMIT 1"
         ]
     )),
@@ -53,11 +53,11 @@ send(Req) ->
 
     %% Parse QS & Get Json Data to send
     QueryString = Req:parse_qs(),
-    UserData = ?MODULE:getclean(proplists:get_value("data", QueryString)),
-    UserId = ?MODULE:getclean(proplists:get_value("uid", QueryString)),
+    UserData = getclean(proplists:get_value("data", QueryString)),
+    UserId = getclean(proplists:get_value("uid", QueryString)),
 
     %% rmv outdated
-    ?MODULE:rmv_old_pr(),
+    rmv_old_pr(),
     
     %% Get All Unique processes (if more than one page opened)
     CheckPids = emysql:execute(myjqrealtime, lists:concat(["SELECT * FROM (SELECT * FROM `processes` WHERE user_id = ", emysql_util:quote(UserId), " ORDER BY end_at DESC) as Sub GROUP BY Sub.browser_session"])),
@@ -96,14 +96,14 @@ wait(Req) ->
     QueryString = Req:parse_qs(),
 
     %% Case
-    case ?MODULE:check_session(Req) of
+    case check_session(Req) of
         {UserId} ->
             %% Spawn our new process
             Listener = spawn(?MODULE, poll, [Req]),
             Proc = erlang:pid_to_list(Listener),
 
             %% rmv outdated
-            ?MODULE:rmv_old_pr(),
+            rmv_old_pr(),
 
             %% Calculate process death
             CurrentTime = calendar:datetime_to_gregorian_seconds(calendar:local_time()),
@@ -113,7 +113,7 @@ wait(Req) ->
             emysql:execute(myjqrealtime,
                 lists:concat([
                     "INSERT INTO processes SET user_id = ", emysql_util:quote(UserId),
-                    ", browser_session = ", emysql_util:quote(?MODULE:getclean(proplists:get_value("id", QueryString))), 
+                    ", browser_session = ", emysql_util:quote(getclean(proplists:get_value("id", QueryString))), 
                     ", pid = ", emysql_util:quote(Proc),
                     ", security = ", round(random:uniform()*1000000),
                     ", end_at = ", emysql_util:quote(lists:concat([Y,"-",M,"-",D," ",H,":",I,":",S]))
@@ -123,7 +123,7 @@ wait(Req) ->
             %% Execute our listener
             Listener;
         false ->
-            ?MODULE:respond(Req, false, false)
+            respond(Req, false, false)
     end.
 
 %% Remove particular process
@@ -139,13 +139,13 @@ rmv_old_pr() ->
 poll(Req) ->
     receive
         {DataJson} ->
-            ?MODULE:respond(Req, true, false, DataJson),
+            respond(Req, true, false, DataJson),
             stop
     after ?TIMEOUT ->
-        ?MODULE:respond(Req, true, true)
+        respond(Req, true, true)
     end.
 
-%% Generic Response
+%% Generic Response of jqRealtime
 respond(Req, Session, Timeout, DataJson) ->
     Req:ok({"text/javascript", ?HEADERS, 
         lists:concat([
@@ -163,7 +163,7 @@ respond(Req, Session, Timeout, DataJson) ->
         }).
 
 respond(Req, Session, Timeout) ->
-    ?MODULE:respond(Req, Session, Timeout, binary_to_list(<<"{}">>)).
+    respond(Req, Session, Timeout, binary_to_list(<<"{}">>)).
 
 %% Get Value or "" if undefined
 getclean(X) when X /= undefined ->
