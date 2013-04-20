@@ -5,7 +5,7 @@
 
 -module(jqrealtime_poller).
 -author("Simon Lamellière <simon@lamellie.re>").
--export([valid_token/1, respond/4, respond/3, rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
+-export([send_all/1, valid_token/1, respond/4, respond/3, rmv_pr/1, rmv_old_pr/0, getclean/1, wait/1, send/1, poll/1, check_session/1]).
 
 %% Poller Config
 -define(TIMEOUT, 30000).
@@ -48,6 +48,54 @@ check_session(Req) ->
         true ->
             false
     end.
+
+%% Call all processes and send data
+%% @todo : code repetition, MUST combine send_all() and send()
+send_all(Req) ->
+    case valid_token(Req) of
+        false ->
+            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
+                            struct, [ {dispatch, -1} ]
+                            })])
+                        });
+        true ->
+            %% Parse QS & Get Json Data to send
+            QueryString = Req:parse_post(),
+            UserData = getclean(proplists:get_value("data", QueryString)),
+            
+            %% rmv outdated
+            rmv_old_pr(),
+
+            %% Get All Unique processes (if more than one page opened)
+            CheckPids = emysql:execute(myjqrealtime, lists:concat(["SELECT * FROM (SELECT * FROM `processes` ORDER BY end_at DESC) as Sub GROUP BY Sub.browser_session"])),
+
+            %% Convert to erlang records
+            Records = emysql_util:as_record(CheckPids, pids, record_info(fields, pids)),
+
+            %% dispatch data
+            Result = case length(Records) of
+                0 ->
+                    false;
+                _ ->
+                    [begin
+                        %% Broadcast each process found
+                        Process = list_to_pid(binary_to_list(Record#pids.pid)),
+
+                        %% RMV Process
+                        rmv_pr(integer_to_list(Record#pids.id)),
+
+                        %% Broadcast data
+                        Process ! {UserData}
+                    end || Record <- Records],
+                    true
+            end,
+
+            %% Respond
+            Req:ok({"text/javascript", ?HEADERS, lists:concat([mochijson2:encode({
+                        struct, [ {dispatch, Result} ]
+                        })])
+                    })
+        end.
 
 %% Call a process and Send Data
 send(Req) ->

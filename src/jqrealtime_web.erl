@@ -50,6 +50,8 @@ loop(Req, DocRoot) ->
                     %% usage POST /push?uid=USER_ID&data={json: json}
                     "push" ->
                         jqrealtime_poller:send(Req);
+                    "push_all" ->
+                        jqrealtime_poller:send_all(Req);
                     _ ->
                         Req:not_found()
                 end;
