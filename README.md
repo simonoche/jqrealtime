@@ -67,5 +67,11 @@ make
 ./start-dev.sh
 ```
 
-- Your webserver is at http://localhost:8080/, but you can configure the port or the IP in src/jqrealtime_sup.erl
+- Your webserver homepage is at http://localhost:8080/, but you can configure the port or the IP in src/jqrealtime_sup.erl
 
+Using jqRealtime
+------------
+
+- You can push data to a user by calling the pull controller : http://localhost:8080/push?uid=1&data={%22message%22:%22Hello%20World!%22}
+
+- **Important** : You have to set a cookie named "jqr", and declare it's value in the table sessions, with a user ID
