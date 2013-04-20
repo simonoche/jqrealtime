@@ -5,8 +5,8 @@
 
 	// Poller Configuration
 	$jqrealtime = array(
-		"pusher" => "http://localhost:8080/push",
-		"poller" => "http://localhost:8080/poll",
+		"pusher" => "http://realtime.dev:8080/push",
+		"poller" => "http://realtime.dev:8080/poll",
 		"token" => "bf3cc858ce88c3fcebcf3e7c691983a28b8dabba"
 		);
 
