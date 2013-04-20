@@ -94,7 +94,7 @@ curl -X POST \
 Examples
 ------------
 
-- Check the "examples" directory.
+- Check the "examples" directory. There is a working PHP example with jQuery. You can adapt this example for your own projects.
 
 Notes
 ------------
